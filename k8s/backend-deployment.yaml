@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: statuspulse-backend
+  namespace: statuspulse
+  labels:
+    app: statuspulse-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: statuspulse-backend
+  template:
+    metadata:
+      labels:
+        app: statuspulse-backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "5000"
+    spec:
+      containers:
+        - name: backend
+          image: DOCKERHUB_USER/statuspulse-backend:IMAGE_TAG
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://statuspulse:statuspulse123@postgres:5432/statuspulse"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: statuspulse
+spec:
+  selector:
+    app: statuspulse-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP

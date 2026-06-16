@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: statuspulse-frontend
+  namespace: statuspulse
+  labels:
+    app: statuspulse-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: statuspulse-frontend
+  template:
+    metadata:
+      labels:
+        app: statuspulse-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: DOCKERHUB_USER/statuspulse-frontend:IMAGE_TAG
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "150m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: statuspulse
+spec:
+  selector:
+    app: statuspulse-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+  type: NodePort
