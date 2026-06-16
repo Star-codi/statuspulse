@@ -22,9 +22,9 @@ pipeline {
             steps {
                 dir('backend') {
                     bat '''
-                        py -m pip install -r requirements.txt --quiet
-                        py -m pip install pytest --quiet
-                        py -m pytest test_app.py -v
+                        python -m pip install -r requirements.txt --quiet
+                        python -m pip install pytest --quiet
+                        python -m pytest test_app.py -v
                     '''
                 }
             }
