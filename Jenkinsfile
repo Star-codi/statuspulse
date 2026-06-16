@@ -13,7 +13,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Star-codi/statuspulse.git'
+                git branch: 'master', url: 'https://github.com/Star-codi/statuspulse.git'
                 echo "Code checked out - build #${BUILD_NUMBER}"
             }
         }
